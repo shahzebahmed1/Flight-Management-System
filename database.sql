@@ -76,3 +76,24 @@ INSERT INTO Flights (flightNumber, airlineID, origin, destination, departureTime
 
 -- WestJet (ID 7): Calgary to Vancouver
 ('WS123', 7, 'YYC', 'YVR', '2025-12-01 09:00:00', '2025-12-01 09:30:00', 120.00, 1);
+-- Table: Payments
+CREATE TABLE Payments (
+    paymentID INT PRIMARY KEY AUTO_INCREMENT,
+    bookingID INT,
+    amount DECIMAL(10,2) NOT NULL,
+    method VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    cardLast4 VARCHAR(4),
+    transactionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID)
+);
+-- Table: Bookings
+CREATE TABLE Bookings (
+    bookingID INT PRIMARY KEY AUTO_INCREMENT,
+    flightID INT,
+    passengerName VARCHAR(100) NOT NULL,
+    passengerEmail VARCHAR(100) NOT NULL,
+    bookingTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (flightID) REFERENCES Flights(flightID)
+);
