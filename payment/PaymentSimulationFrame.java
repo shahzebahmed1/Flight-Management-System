@@ -2,7 +2,7 @@ package payment;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
-
+import payment.PaymentDAO;
 public class PaymentSimulationFrame extends JFrame {
 
     private JTextField txtBookingId;
