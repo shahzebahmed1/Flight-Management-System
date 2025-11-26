@@ -1,8 +1,11 @@
+
+// src/main/java/BookingDemo.java
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class BookingDemo {
     private JFrame frame;
@@ -15,10 +18,8 @@ public class BookingDemo {
     private JTextArea txtConfirmation;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new BookingDemo().createGUI();
-            }
+        SwingUtilities.invokeLater(() -> {
+            new BookingDemo().createGUI();
         });
     }
 
@@ -66,16 +67,27 @@ public class BookingDemo {
         frame.add(new JScrollPane(txtConfirmation), BorderLayout.SOUTH);
 
         frame.pack();
-
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
         btnCreateBooking.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String flightId = txtFlightId.getText();
                 String customerId = txtCustomerId.getText();
-                int seatCount = Integer.parseInt(txtSeatCount.getText());
+                int seatCount;
 
-                BookingService bookingService = new BookingService(Arrays.asList(new Flight(flightId, "NYC", "LAX", LocalDateTime.of(2025, 1, 10, 9, 30), 100, new BigDecimal("199.99")), Arrays.asList(new Customer(customerId, "Alice Smith", "alice@example.com")));
+                try {
+                    seatCount = Integer.parseInt(txtSeatCount.getText());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Invalid seat count!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                BookingService bookingService = createBookingService(flightId, customerId);
 
                 Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
                 txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
@@ -86,11 +98,22 @@ public class BookingDemo {
             public void actionPerformed(ActionEvent e) {
                 String flightId = txtFlightId.getText();
                 String customerId = txtCustomerId.getText();
-                int seatCount = Integer.parseInt(txtSeatCount.getText());
+                int seatCount;
 
-                BookingService bookingService = new BookingService(Arrays.asList(new Flight(flightId, "NYC", "LAX", LocalDateTime.of(2025, 1, 10, 9, 30), 100, new BigDecimal("199.99")), Arrays.asList(new Customer(customerId, "Alice Smith", "alice@example.com")));
+                try {
+                    seatCount = Integer.parseInt(txtSeatCount.getText());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Invalid seat count!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                Booking booking = bookingService.getBookingOrThrow(flightId);
+                BookingService bookingService = createBookingService(flightId, customerId);
+
+                Booking booking = bookingService.getBookingOrThrow(flightId); // assumes lookup by flightId
                 bookingService.modifyBooking(booking.getId(), seatCount);
                 txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
             }
@@ -101,12 +124,33 @@ public class BookingDemo {
                 String flightId = txtFlightId.getText();
                 String customerId = txtCustomerId.getText();
 
-                BookingService bookingService = new BookingService(Arrays.asList(new Flight(flightId, "NYC", "LAX", LocalDateTime.of(2025, 1, 10, 9, 30), 100, new BigDecimal("199.99")), Arrays.asList(new Customer(customerId, "Alice Smith", "alice@example.com")));
+                BookingService bookingService = createBookingService(flightId, customerId);
 
-                Booking booking = bookingService.getBookingOrThrow(flightId);
+                Booking booking = bookingService.getBookingOrThrow(flightId); // assumes lookup by flightId
                 bookingService.cancelBooking(booking.getId());
                 txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
             }
         });
     }
 
+    /**
+     * Keeps the way BookingService is constructed in one place so it’s easy to
+     * change.
+     */
+    private BookingService createBookingService(String flightId, String customerId) {
+        return new BookingService(
+                Arrays.asList(
+                        new Flight(
+                                flightId,
+                                "NYC",
+                                "LAX",
+                                LocalDateTime.of(2025, 1, 10, 9, 30),
+                                100,
+                                new BigDecimal("199.99"))),
+                Arrays.asList(
+                        new Customer(
+                                customerId,
+                                "Alice Smith",
+                                "alice@example.com")));
+    }
+}
