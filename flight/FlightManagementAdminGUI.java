@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.List;
 
@@ -119,20 +120,20 @@ public class FlightManagementAdminGUI {
     }
 
     private void addFlight() {
-        try {
-            Airline airline = (Airline) airlineComboBox.getSelectedItem();
-            Aircraft aircraft = (Aircraft) aircraftComboBox.getSelectedItem();
+        final Airline airline = (Airline) airlineComboBox.getSelectedItem();
+        final Aircraft aircraft = (Aircraft) aircraftComboBox.getSelectedItem();
 
-            field.setText("");
-            label.setText("Enter flight number:");
-            button.setText("Add flight");
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String flightNumber = field.getText();
-                    if (flightNumber.isEmpty()) {
-                        JOptionPane.showMessageDialog(frame, "Please enter a flight number.", "Add flight", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+        field.setText("");
+        label.setText("Enter flight number:");
+        button.setText("Add flight");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String flightNumber = field.getText();
+                if (flightNumber.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Please enter a flight number.", "Add flight", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
                     FlightRecord newFlight = new FlightRecord(
                             0,
                             flightNumber,
@@ -148,11 +149,13 @@ public class FlightManagementAdminGUI {
                     );
                     flightDAO.insertFlight(newFlight);
                     JOptionPane.showMessageDialog(frame, "Flight added successfully.", "Add flight", JOptionPane.INFORMATION_MESSAGE);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(frame, "Database error: " + ex.getMessage(), "Add flight", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Error: " + ex.getMessage(), "Add flight", JOptionPane.ERROR_MESSAGE);
                 }
-            });
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(frame, "Database error: " + e.getMessage(), "Add flight", JOptionPane.ERROR_MESSAGE);
-        }
+            }
+        });
     }
 
     private void updateFlight() {
@@ -196,27 +199,32 @@ public class FlightManagementAdminGUI {
                     label.setText("Enter new flight number (leave empty to keep current):");
                     field.setText(existing.getFlightNumber());
 
+                    final FlightRecord finalExisting = existing;
                     button.setText("Update flight");
                     button.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             String flightNumber = field.getText();
-                            if (flightNumber.isEmpty()) flightNumber = existing.getFlightNumber();
+                            if (flightNumber.isEmpty()) flightNumber = finalExisting.getFlightNumber();
 
-                            FlightRecord updated = new FlightRecord(
-                                    existing.getFlightId(),
-                                    flightNumber,
-                                    existing.getAirlineId(),
-                                    existing.getAirlineName(),
-                                    existing.getOrigin(),
-                                    existing.getDestination(),
-                                    existing.getDepartureTime(),
-                                    existing.getArrivalTime(),
-                                    existing.getPrice(),
-                                    existing.getAircraftId(),
-                                    existing.getAircraftModel()
-                            );
-                            flightDAO.updateFlight(updated);
-                            JOptionPane.showMessageDialog(frame, "Flight updated successfully.", "Update flight", JOptionPane.INFORMATION_MESSAGE);
+                            try {
+                                FlightRecord updated = new FlightRecord(
+                                        finalExisting.getFlightId(),
+                                        flightNumber,
+                                        finalExisting.getAirlineId(),
+                                        finalExisting.getAirlineName(),
+                                        finalExisting.getOrigin(),
+                                        finalExisting.getDestination(),
+                                        finalExisting.getDepartureTime(),
+                                        finalExisting.getArrivalTime(),
+                                        finalExisting.getPrice(),
+                                        finalExisting.getAircraftId(),
+                                        finalExisting.getAircraftModel()
+                                );
+                                flightDAO.updateFlight(updated);
+                                JOptionPane.showMessageDialog(frame, "Flight updated successfully.", "Update flight", JOptionPane.INFORMATION_MESSAGE);
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(frame, "Database error: " + ex.getMessage(), "Update flight", JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     });
                 }
@@ -266,8 +274,12 @@ public class FlightManagementAdminGUI {
 
                     int confirm = JOptionPane.showConfirmDialog(frame, "Are you sure?", "Delete flight", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
-                        flightDAO.deleteFlight(id);
-                        JOptionPane.showMessageDialog(frame, "Flight deleted successfully.", "Delete flight", JOptionPane.INFORMATION_MESSAGE);
+                        try {
+                            flightDAO.deleteFlight(id);
+                            JOptionPane.showMessageDialog(frame, "Flight deleted successfully.", "Delete flight", JOptionPane.INFORMATION_MESSAGE);
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(frame, "Database error: " + ex.getMessage(), "Delete flight", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             });
@@ -275,4 +287,4 @@ public class FlightManagementAdminGUI {
             JOptionPane.showMessageDialog(frame, "Database error: " + e.getMessage(), "Delete flight", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+}

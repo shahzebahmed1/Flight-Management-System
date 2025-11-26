@@ -9,7 +9,7 @@ public class DatabaseConnectivity {
     private static final String DB_URL =
             "jdbc:mysql://localhost:3306/flightdb?useSSL=false&serverTimezone=UTC";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "YOUR_PASSWORD";
+    private static final String DB_PASSWORD = "admin";
 
     static {
         try {

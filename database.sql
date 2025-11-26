@@ -76,7 +76,20 @@ INSERT INTO Flights (flightNumber, airlineID, origin, destination, departureTime
 
 -- WestJet (ID 7): Calgary to Vancouver
 ('WS123', 7, 'YYC', 'YVR', '2025-12-01 09:00:00', '2025-12-01 09:30:00', 120.00, 1);
--- Table: Payments
+
+-- Table: Bookings (must be created before Payments)
+CREATE TABLE Bookings (
+    bookingID INT PRIMARY KEY AUTO_INCREMENT,
+    flightID INT,
+    passengerName VARCHAR(100) NOT NULL,
+    passengerEmail VARCHAR(100) NOT NULL,
+    seatNumber INT,
+    bookingTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (flightID) REFERENCES Flights(flightID)
+);
+
+-- Table: Payments (references Bookings, so must be created after)
 CREATE TABLE Payments (
     paymentID INT PRIMARY KEY AUTO_INCREMENT,
     bookingID INT,
@@ -87,14 +100,17 @@ CREATE TABLE Payments (
     transactionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bookingID) REFERENCES Bookings(bookingID)
 );
--- Table: Bookings
-CREATE TABLE Bookings (
-    bookingID INT PRIMARY KEY AUTO_INCREMENT,
-    flightID INT,
-    passengerName VARCHAR(100) NOT NULL,
-    passengerEmail VARCHAR(100) NOT NULL,
-    bookingTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20) NOT NULL,
-    FOREIGN KEY (flightID) REFERENCES Flights(flightID)
+
+-- Table: Users (for authentication)
+CREATE TABLE Users (
+    userID INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
+    role VARCHAR(20) NOT NULL
 );
+
+-- Insert default admin and employee accounts
+INSERT INTO Users (username, password, role) VALUES
+('admin', 'admin123', 'ADMIN'),
+('employee', 'emp123', 'EMPLOYEE');
 
