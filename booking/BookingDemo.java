@@ -115,7 +115,7 @@ public class BookingDemo {
     }
 
     /**
-     * Keeps the way BookingService is constructed in one place so it’s easy to
+     * Keeps the way BookingService is constructed in one place so it's easy to
      * change.
      */
     private BookingService createBookingService(String flightId, String customerId) {
