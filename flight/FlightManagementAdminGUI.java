@@ -113,25 +113,17 @@ public class FlightManagementAdminGUI {
             }
 
             switch (choice) {
-                case 1:
-                    listFlights();
-                    break;
-                case 2:
-                    addFlight();
-                    break;
-                case 3:
-                    updateFlight();
-                    break;
-                case 4:
-                    deleteFlight();
-                    break;
-                case 0:
+                case 1 -> listFlights();
+                case 2 -> addFlight();
+                case 3 -> updateFlight();
+                case 4 -> deleteFlight();
+                case 0 -> {
                     JOptionPane.showMessageDialog(frame, "Goodbye.");
                     frame.dispose();
                     break;
-                default:
-                    JOptionPane.showMessageDialog(frame, "Invalid choice.", "Menu",
-                            JOptionPane.WARNING_MESSAGE);
+                }
+                default -> JOptionPane.showMessageDialog(frame, "Invalid choice.", "Menu",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
     }
