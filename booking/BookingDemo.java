@@ -1,36 +1,137 @@
+
+// src/main/java/BookingDemo.java
+import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import javax.swing.*;
 
 public class BookingDemo {
+    private JFrame frame;
+    private JTextField txtFlightId;
+    private JTextField txtCustomerId;
+    private JTextField txtSeatCount;
+    private JButton btnCreateBooking;
+    private JButton btnModifyBooking;
+    private JButton btnCancelBooking;
+    private JTextArea txtConfirmation;
+
     public static void main(String[] args) {
-        Flight flight = new Flight(
-                "FL123",
-                "NYC",
-                "LAX",
-                LocalDateTime.of(2025, 1, 10, 9, 30),
-                100,
-                new BigDecimal("199.99"));
+        SwingUtilities.invokeLater(() -> {
+            new BookingDemo().createGUI();
+        });
+    }
 
-        Customer customer = new Customer(
-                "C001",
-                "Alice Smith",
-                "alice@example.com");
+    private void createGUI() {
+        frame = new JFrame("Booking Demo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
 
-        BookingService bookingService = new BookingService(Arrays.asList(flight), Arrays.asList(customer));
+        JPanel panelFields = new JPanel();
+        panelFields.setLayout(new GridLayout(3, 2, 5, 5));
 
-        // Create a new booking
-        Booking booking = bookingService.createBooking("FL123", "C001", 2);
-        System.out.println(bookingService.generateConfirmation(booking.getId()));
+        JLabel lblFlightId = new JLabel("Flight ID:");
+        JLabel lblCustomerId = new JLabel("Customer ID:");
+        JLabel lblSeatCount = new JLabel("Seat count:");
 
-        // Modify the booking
-        bookingService.modifyBooking(booking.getId(), 3);
-        System.out.println("After modification:");
-        System.out.println(bookingService.generateConfirmation(booking.getId()));
+        txtFlightId = new JTextField();
+        txtCustomerId = new JTextField();
+        txtSeatCount = new JTextField();
 
-        // Cancel the booking
-        bookingService.cancelBooking(booking.getId());
-        System.out.println("After cancellation:");
-        System.out.println(bookingService.generateConfirmation(booking.getId()));
+        panelFields.add(lblFlightId);
+        panelFields.add(txtFlightId);
+        panelFields.add(lblCustomerId);
+        panelFields.add(txtCustomerId);
+        panelFields.add(lblSeatCount);
+        panelFields.add(txtSeatCount);
+
+        frame.add(panelFields, BorderLayout.NORTH);
+
+        JPanel panelButtons = new JPanel();
+        panelButtons.setLayout(new FlowLayout());
+
+        btnCreateBooking = new JButton("Create booking");
+        btnModifyBooking = new JButton("Modify booking");
+        btnCancelBooking = new JButton("Cancel booking");
+
+        panelButtons.add(btnCreateBooking);
+        panelButtons.add(btnModifyBooking);
+        panelButtons.add(btnCancelBooking);
+
+        frame.add(panelButtons, BorderLayout.CENTER);
+
+        txtConfirmation = new JTextArea(10, 20);
+        txtConfirmation.setEditable(false);
+
+        frame.add(new JScrollPane(txtConfirmation), BorderLayout.SOUTH);
+
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+        btnCreateBooking.addActionListener(e -> {
+            String flightId = txtFlightId.getText();
+            String customerId = txtCustomerId.getText();
+            int seatCount;
+
+            try {
+                seatCount = Integer.parseInt(txtSeatCount.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Invalid seat count!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            BookingService bookingService = createBookingService(flightId, customerId);
+
+            Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
+            txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+        });
+
+        btnModifyBooking.addActionListener(e -> {
+            String flightId = txtFlightId.getText();
+            String customerId = txtCustomerId.getText();
+            int seatCount;
+
+            try {
+                seatCount = Integer.parseInt(txtSeatCount.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Invalid seat count!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            BookingService bookingService = createBookingService(flightId, customerId);
+
+            Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
+            txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+        });
+    }
+
+    /**
+     * Keeps the way BookingService is constructed in one place so it's easy to
+     * change.
+     */
+    private BookingService createBookingService(String flightId, String customerId) {
+        return new BookingService(
+                Arrays.asList(
+                        new Flight(
+                                flightId,
+                                "NYC",
+                                "LAX",
+                                LocalDateTime.of(2025, 1, 10, 9, 30),
+                                100,
+                                new BigDecimal("199.99"))),
+                Arrays.asList(
+                        new Customer(
+                                customerId,
+                                "Alice Smith",
+                                "alice@example.com")));
     }
 }
