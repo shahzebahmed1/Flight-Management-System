@@ -2,7 +2,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import customer.Customer;
 
+/**
+ * In-memory booking orchestration service.
+ */
 public class BookingService {
 
     private final Map<String, Flight> flights = new HashMap<>();
@@ -10,62 +14,39 @@ public class BookingService {
     private final Map<String, Booking> bookings = new HashMap<>();
 
     public BookingService(Collection<Flight> flights, Collection<Customer> customers) {
-        for (Flight f : flights) {
-            this.flights.put(f.getId(), f);
+        if (flights != null) {
+            for (Flight f : flights) {
+                this.flights.put(f.getId(), f);
+            }
         }
-        for (Customer c : customers) {
-            this.customers.put(c.getId(), c);
+        if (customers != null) {
+            for (Customer c : customers) {
+                this.customers.put(c.getId(), c);
+            }
         }
     }
 
-    // --- Make a new booking ---
     public Booking createBooking(String flightId, String customerId, int seatCount) {
-        if (seatCount <= 0) {
-            throw new IllegalArgumentException("Seat count must be positive.");
-        }
+        Flight flight = requireFlight(flightId);
+        Customer customer = requireCustomer(customerId);
 
-        Flight flight = flights.get(flightId);
-        if (flight == null) {
-            throw new IllegalArgumentException("Flight not found: " + flightId);
-        }
-
-        Customer customer = customers.get(customerId);
-        if (customer == null) {
-            throw new IllegalArgumentException("Customer not found: " + customerId);
-        }
-
-        // Check and reserve seats
         flight.bookSeats(seatCount);
 
-        String bookingId = UUID.randomUUID().toString();
-        Booking booking = new Booking(bookingId, flight, customer, seatCount);
-        bookings.put(bookingId, booking);
-
+        String id = UUID.randomUUID().toString();
+        Booking booking = new Booking(id, flight, customer, seatCount);
+        bookings.put(id, booking);
         return booking;
     }
 
-    // --- Modify an existing booking (change number of seats) ---
     public Booking modifyBooking(String bookingId, int newSeatCount) {
-        if (newSeatCount <= 0) {
-            throw new IllegalArgumentException("Seat count must be positive.");
-        }
-
+        if (newSeatCount <= 0) throw new IllegalArgumentException("newSeatCount must be > 0");
         Booking booking = getBookingOrThrow(bookingId);
-
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("Cannot modify a cancelled booking.");
-        }
-
-        Flight flight = booking.getFlight();
-        int oldSeatCount = booking.getSeatCount();
-        int delta = newSeatCount - oldSeatCount;
+        int delta = newSeatCount - booking.getSeatCount();
 
         if (delta > 0) {
-            // Need more seats
-            flight.bookSeats(delta);
+            booking.getFlight().bookSeats(delta);
         } else if (delta < 0) {
-            // Releasing seats
-            flight.releaseSeats(-delta);
+            booking.getFlight().releaseSeats(-delta);
         }
 
         booking.setSeatCount(newSeatCount);
@@ -73,40 +54,10 @@ public class BookingService {
         return booking;
     }
 
-    // --- Cancel an existing booking ---
-    public Booking cancelBooking(String bookingId) {
+    public void cancelBooking(String bookingId) {
         Booking booking = getBookingOrThrow(bookingId);
-
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            return booking; // already cancelled
-        }
-
-        Flight flight = booking.getFlight();
-        flight.releaseSeats(booking.getSeatCount());
+        booking.getFlight().releaseSeats(booking.getSeatCount());
         booking.setStatus(BookingStatus.CANCELLED);
-        return booking;
-    }
-
-    // --- Generate a booking confirmation string ---
-    public String generateConfirmation(String bookingId) {
-        Booking booking = getBookingOrThrow(bookingId);
-        Flight flight = booking.getFlight();
-        Customer customer = booking.getCustomer();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== Booking Confirmation ===\n");
-        sb.append("Booking ID: ").append(booking.getId()).append("\n");
-        sb.append("Status: ").append(booking.getStatus()).append("\n\n");
-        sb.append("Customer: ").append(customer.getName())
-          .append(" (").append(customer.getEmail()).append(")\n");
-        sb.append("Flight: ").append(flight.getId()).append("\n");
-        sb.append("Route: ").append(flight.getOrigin())
-          .append(" -> ").append(flight.getDestination()).append("\n");
-        sb.append("Departure: ").append(flight.getDepartureTime()).append("\n");
-        sb.append("Seats: ").append(booking.getSeatCount()).append("\n");
-        sb.append("============================\n");
-
-        return sb.toString();
     }
 
     public Booking getBookingOrThrow(String bookingId) {
@@ -115,5 +66,37 @@ public class BookingService {
             throw new IllegalArgumentException("Booking not found: " + bookingId);
         }
         return booking;
+    }
+
+    public String generateConfirmation(String bookingId) {
+        Booking booking = getBookingOrThrow(bookingId);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("===== BOOKING CONFIRMATION =====
+");
+        sb.append("Booking ID: ").append(booking.getId()).append("\n");
+        sb.append("Status: ").append(booking.getStatus()).append("\n");
+        sb.append("Customer: ").append(booking.getCustomer().getName())
+          .append(" <").append(booking.getCustomer().getEmail()).append(">").append("\n");
+        sb.append("Flight: ").append(booking.getFlight().getId())
+          .append(" ").append(booking.getFlight().getOrigin())
+          .append(" → ").append(booking.getFlight().getDestination()).append("\n");
+        sb.append("Departure: ").append(booking.getFlight().getDepartureTime()).append("\n");
+        sb.append("Seats: ").append(booking.getSeatCount()).append("\n");
+        sb.append("============================\n");
+
+        return sb.toString();
+    }
+
+    private Flight requireFlight(String id) {
+        Flight f = flights.get(id);
+        if (f == null) throw new IllegalArgumentException("Unknown flight: " + id);
+        return f;
+    }
+
+    private Customer requireCustomer(String id) {
+        Customer c = customers.get(id);
+        if (c == null) throw new IllegalArgumentException("Unknown customer: " + id);
+        return c;
     }
 }

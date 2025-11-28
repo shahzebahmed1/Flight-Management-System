@@ -1,6 +1,9 @@
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Simple in-memory flight entity with seat tracking.
+ */
 public class Flight {
     private final String id;
     private final String origin;
@@ -16,6 +19,12 @@ public class Flight {
                   LocalDateTime departureTime,
                   int capacity,
                   BigDecimal price) {
+        if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
+        if (origin == null || origin.isBlank()) throw new IllegalArgumentException("origin is required");
+        if (destination == null || destination.isBlank()) throw new IllegalArgumentException("destination is required");
+        if (departureTime == null) throw new IllegalArgumentException("departureTime is required");
+        if (capacity <= 0) throw new IllegalArgumentException("capacity must be positive");
+        if (price == null) throw new IllegalArgumentException("price is required");
         this.id = id;
         this.origin = origin;
         this.destination = destination;
