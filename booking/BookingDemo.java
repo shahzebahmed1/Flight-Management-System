@@ -1,11 +1,10 @@
-
 // src/main/java/BookingDemo.java
 import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import javax.swing.*;
-
+import customer.*;
 public class BookingDemo {
     private JFrame frame;
     private JTextField txtFlightId;
@@ -87,8 +86,16 @@ public class BookingDemo {
 
             BookingService bookingService = createBookingService(flightId, customerId);
 
-            Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
-            txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+            try {
+                Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
+                txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         btnModifyBooking.addActionListener(e -> {
@@ -109,13 +116,22 @@ public class BookingDemo {
 
             BookingService bookingService = createBookingService(flightId, customerId);
 
-            Booking booking = bookingService.createBooking(flightId, customerId, seatCount);
-            txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+            try {
+                Booking booking = bookingService.getBookingOrThrow(flightId + "_" + customerId);
+                bookingService.modifyBooking(booking.getId(), seatCount);
+                txtConfirmation.setText(bookingService.generateConfirmation(booking.getId()));
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         });
     }
 
     /**
-     * Keeps the way BookingService is constructed in one place so it's easy to
+     * Keeps the way bookingService is constructed in one place so it's easy to
      * change.
      */
     private BookingService createBookingService(String flightId, String customerId) {
@@ -134,4 +150,4 @@ public class BookingDemo {
                                 "Alice Smith",
                                 "alice@example.com")));
     }
-}
+
