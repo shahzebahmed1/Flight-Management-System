@@ -1,12 +1,10 @@
+import database.DatabaseConnectivity;
 import java.awt.*;
-import java.awt.event.*;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 public class FlightSearchView {
     
     private JFrame frame;
