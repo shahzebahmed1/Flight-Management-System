@@ -1,46 +1,32 @@
 # Flight Management System
 
-A Java desktop application for managing flight reservations, bookings, and payments. Built with Swing GUI and MySQL database.
+A comprehensive Java desktop application for managing flight reservations, bookings, and payments. Built with Java Swing for the user interface and MySQL for data persistence.
 
 ## Features
 
-- **Customer Features** (No login required)
-  - Search flights by origin, destination, date, or airline
-  - Book flights with seat selection
-  - View and manage bookings
-  - Payment processing integrated with bookings
-
-- **Admin Features** (Login required)
-  - Add, update, and delete flights
-  - View all flights in the system
-  - Manage flight schedules
-
-- **Employee Features** (Login required)
-  - View all bookings
-  - Modify customer reservations
-  - Manage customer data
-  - View flight schedules
+- **Customer Portal**: Search flights, make bookings, select seats, and manage reservations
+- **Admin Dashboard**: Manage flights (add, update, delete), view all bookings
+- **Employee Dashboard**: Manage customer data, modify reservations, view schedules
+- **Payment Processing**: Integrated payment system with credit/debit card support
+- **Seat Selection**: Visual seat map with real-time availability
 
 ## Requirements
 
-- Java JDK 8 or higher
-- MySQL Database (5.7 or higher)
-- MySQL JDBC Driver (included in `mysql-connector-j-9.5.0` folder)
+- **Java JDK 8 or higher**
+- **MySQL 5.7 or higher**
+- **MySQL JDBC Driver** (included in project)
 
-## Setup
+## Quick Start
 
 ### 1. Database Setup
 
-1. Open MySQL Workbench
+1. Open MySQL Workbench and connect to your MySQL server
 2. Create the database:
    ```sql
    CREATE DATABASE flightdb;
    ```
 3. Select the database (double-click `flightdb` in Schemas)
-4. Open and run `database.sql` file:
-   - File → Open SQL Script
-   - Select `database.sql`
-   - Click Execute (lightning bolt icon)
+4. Open and run the `database.sql` file to create tables and sample data
 
 ### 2. Configure Database Connection
 
@@ -50,59 +36,81 @@ Update the database password in these files:
 
 Change the password to match your MySQL root password.
 
-## How to Compile and Run
+### 3. Compile the Project
 
-1. **Compile all Java files:**
-   ```bash
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar" booking/*.java
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar" flight/*.java flight/database/*.java
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar" payment/*.java payment/database/*.java
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar;flight;payment" auth/UserDAO.java
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar;flight;payment" booking/BookingDAO.java
-   javac -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar;flight;payment;auth;booking" CustomerGUI.java
-   ```
+Open a terminal in the project root directory and run:
 
-2. **Run the application:**
-   ```bash
-   java -cp ".;mysql-connector-j-9.5.0/mysql-connector-j-9.5.0.jar;flight;payment;auth;booking" CustomerGUI
-   ```
+```bash
+scripts\compile.bat
+```
 
-## Default Login Credentials
+This will compile all Java source files. Make sure you see "Compilation successful" at the end.
 
-**Admin:**
+### 4. Run the Application
+
+```bash
+scripts\run.bat
+```
+
+The application will launch with the customer home screen.
+
+## Using the Application
+
+### Customer Features (No Login Required)
+
+- **Search Flights**: Search by origin, destination, date, or airline (all fields optional)
+- **Book Flights**: Select a flight, choose a seat, enter passenger info, and complete payment
+- **View Bookings**: Enter your email to see all your reservations
+- **Flight Schedule**: Browse all available flights
+
+### Admin Login
+
 - Username: `admin`
 - Password: `admin123`
+- Features: Add/update/delete flights, view all bookings
 
-**Employee:**
+### Employee Login
+
 - Username: `employee`
 - Password: `emp123`
+- Features: Manage customer data, modify reservations, view schedules
 
 ## Project Structure
 
 ```
 Flight-Management-System/
-├── booking/              # Booking management
-├── flight/               # Flight management
-├── payment/              # Payment processing
-├── auth/                 # Authentication
-├── database.sql          # Database schema
-└── CustomerGUI.java      # Main application
+├── scripts/              # Build and run scripts
+│   ├── compile.bat       # Compilation script
+│   └── run.bat          # Application launcher
+├── booking/             # Booking management classes
+├── flight/              # Flight management classes
+│   └── database/        # Database connectivity
+├── payment/             # Payment processing classes
+│   └── database/        # Database connectivity
+├── auth/                # Authentication classes
+├── CustomerGUI.java     # Main application entry point
+├── database.sql         # Database schema and initial data
+└── mysql-connector-j-9.5.0/  # MySQL JDBC driver
 ```
 
 ## Troubleshooting
 
 **"MySQL JDBC Driver not found"**
-- Make sure `mysql-connector-j-9.5.0` folder exists in project root
-- Check that `mysql-connector-j-9.5.0.jar` is inside that folder
+- Ensure `mysql-connector-j-9.5.0.jar` exists in the `mysql-connector-j-9.5.0` folder
 
 **"Access denied for user"**
-- Verify MySQL username and password in DatabaseConnectivity.java files
-- Make sure MySQL server is running
+- Check your MySQL password in the DatabaseConnectivity.java files
+- Verify MySQL server is running
 
 **"Unknown database 'flightdb'"**
-- Run the `database.sql` script in MySQL Workbench
-- Make sure you've selected the `flightdb` database
+- Make sure you've created the database and run `database.sql`
 
 **Compilation errors**
-- Ensure Java JDK 8+ is installed
-- Check that all files are in correct package directories
+- Ensure Java JDK 8+ is installed: `java -version`
+- Check that all source files are in the correct directories
+
+## Development Notes
+
+- Main entry point: `CustomerGUI.java`
+- Database connection settings are in `flight/database/DatabaseConnectivity.java` and `payment/database/DatabaseConnectivity.java`
+- Default admin credentials can be changed in the database `Users` table

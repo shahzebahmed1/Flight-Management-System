@@ -1,0 +1,23 @@
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# MySQL connector (if you want to exclude it, uncomment below)
+# mysql-connector-j-9.5.0/
+
