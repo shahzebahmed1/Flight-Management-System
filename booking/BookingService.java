@@ -2,7 +2,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import customer.Customer;
+import booking.customer.Customer;
 
 /**
  * In-memory booking orchestration service.
@@ -72,8 +72,7 @@ public class BookingService {
         Booking booking = getBookingOrThrow(bookingId);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("===== BOOKING CONFIRMATION =====
-");
+        sb.append("===== BOOKING CONFIRMATION =====\n");
         sb.append("Booking ID: ").append(booking.getId()).append("\n");
         sb.append("Status: ").append(booking.getStatus()).append("\n");
         sb.append("Customer: ").append(booking.getCustomer().getName())

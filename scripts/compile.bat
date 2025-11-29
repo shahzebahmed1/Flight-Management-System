@@ -28,7 +28,7 @@ if errorlevel 1 goto :error
 
 REM Compile payment package
 echo [3/6] Compiling payment package...
-javac -cp ".;mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar" -encoding UTF-8 payment\*.java payment\database\*.java
+javac -cp ".;mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar;flight" -encoding UTF-8 payment\*.java
 if errorlevel 1 goto :error
 
 REM Compile auth package

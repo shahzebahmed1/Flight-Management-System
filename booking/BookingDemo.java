@@ -1,5 +1,5 @@
 // src/main/java/BookingDemo.java
-import customer.*;
+import booking.customer.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

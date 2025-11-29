@@ -1,4 +1,4 @@
-package customer;
+package booking.customer;
 public class Customer {
     private final String id;
     private final String name;

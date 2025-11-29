@@ -1,5 +1,5 @@
 import java.time.LocalDateTime;
-import customer.Customer;
+import booking.customer.Customer;
 
 /**
  * Immutable-ish booking aggregate. SeatCount and status can change; id/flight/customer/createdAt do not.
@@ -33,7 +33,7 @@ public class Booking {
         return flight;
     }
 
-    public customer.Customer getCustomer() {
+    public booking.customer.Customer getCustomer() {
         return customer;
     }
 

@@ -891,7 +891,7 @@ public class CustomerGUI extends JFrame {
                         return;
                     }
                     
-                    bookingDAO.updateBookingDetails(finalExisting.getBookingId(), name, email);
+                    bookingDAO.updateBookingDetails(finalExisting.getBookingId(), finalExisting.getFlightId(), name, email);
                     bookingDAO.updateBookingStatus(finalExisting.getBookingId(), status);
                     
                     JOptionPane.showMessageDialog(dialog, "Booking updated successfully!", 
@@ -1925,5 +1925,3 @@ public class CustomerGUI extends JFrame {
         });
     }
 }
-
->>>>>>> Stashed changes
