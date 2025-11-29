@@ -1,7 +1,7 @@
 public class Aircraft {
-    private int aircraftId;
-    private String model;
-    private int capacity;
+    private final int aircraftId;
+    private final String model;
+    private final int capacity;
 
     public Aircraft(int aircraftId, String model, int capacity) {
         this.aircraftId = aircraftId;
