@@ -1,11 +1,10 @@
 // src/main/java/BookingDemo.java
+import customer.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import javax.swing.*;
-import customer.*;
 
 public class BookingDemo {
     private JFrame frame;
